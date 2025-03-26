@@ -64,64 +64,38 @@ async def process_brochure(file: UploadFile = File(...)) -> Dict:
         if not result:
             raise HTTPException(status_code=500, detail="Failed to process the brochure")
         
-        # Format the response exactly as in processed_brochure.txt
+        # Format the response using actual extracted data
         formatted_response = {
             "content": {
                 "1️⃣ Introduction": {
-                    "Policy Name": result['policy_details']['policy_name'],
-                    "Policy Number": result['policy_details']['policy_number'],
-                    "Issued by": result['policy_details']['insurer_name'],
-                    "Insurer Contact": result['policy_details']['insurer_contact'],
-                    "Date of Issue": result['policy_details']['issue_date'],
-                    "Expiry Date": result['policy_details']['expiry_date']
+                    "Policy Name": result['policy_details'].get('policy_name', 'Not found'),
+                    "Policy Number": result['policy_details'].get('policy_number', 'Not found'),
+                    "Issued by": result['policy_details'].get('insurer_name', 'Not found'),
+                    "Insurer Contact": result['policy_details'].get('insurer_contact', 'Not found'),
+                    "Date of Issue": result['policy_details'].get('issue_date', 'Not found'),
+                    "Expiry Date": result['policy_details'].get('expiry_date', 'Not found')
                 },
                 "2️⃣ Coverage Overview": {
-                    "Type of Insurance": result['coverage_details']['type'],
-                    "Sum Assured": f"₹{result['coverage_details']['sum_assured']}",
-                    "Risks Covered": [f"✅ {risk}" for risk in result['coverage_details']['risks_covered']],
-                    "Additional Benefits": [f"🚀 {benefit}" for benefit in result['coverage_details']['additional_benefits']]
+                    "Type of Insurance": result['coverage_details'].get('type', 'Not found'),
+                    "Sum Assured": f"₹{result['coverage_details'].get('sum_assured', 'Not found')}",
+                    "Risks Covered": [f"✅ {risk}" for risk in result['coverage_details'].get('risks_covered', [])],
+                    "Additional Benefits": [f"🚀 {benefit}" for benefit in result['coverage_details'].get('additional_benefits', [])]
                 },
                 "3️⃣ Premium & Payment Details": {
-                    "Premium Amount": f"₹{result['premium_info']['amount']}",
-                    "Payment Frequency": result['premium_info']['frequency'],
-                    "Due Date": result['premium_info']['due_dates'],
-                    "Grace Period": result['premium_info']['grace_period']
+                    "Premium Amount": f"₹{result['premium_info'].get('amount', 'Not found')}",
+                    "Payment Frequency": result['premium_info'].get('frequency', 'Not found'),
+                    "Due Date": result['premium_info'].get('due_dates', 'Not found'),
+                    "Grace Period": result['premium_info'].get('grace_period', 'Not found')
                 },
                 "4️⃣ Benefits & Advantages": {
-                    "Key Benefits": [
-                        "🌟 Comprehensive health coverage",
-                        "🌟 Cashless hospitalization at network hospitals",
-                        "🌟 Pre and post hospitalization expenses",
-                        "🌟 Day care procedures coverage",
-                        "🌟 Alternative treatment coverage",
-                        "🌟 No claim bonus benefits",
-                        "🌟 Tax benefits under section 80D",
-                        "🌟 Lifelong renewal option",
-                        "🌟 Restoration benefit",
-                        "🌟 Cumulative bonus"
-                    ]
+                    "Key Benefits": [f"🌟 {benefit}" for benefit in result['coverage_details'].get('additional_benefits', [])]
                 },
                 "5️⃣ Exclusions & Limitations": {
-                    "Not Covered": [f"❌ {exclusion}" for exclusion in result['exclusions']]
+                    "Not Covered": [f"❌ {exclusion}" for exclusion in result.get('exclusions', [])]
                 },
                 "6️⃣ Potential Loopholes & Important Considerations": {
                     "Important Points to Note": [
-                        "⚠️ Pre-existing diseases waiting period: Insurance won't cover any pre-existing conditions for the first 2-4 years",
-                        "⚠️ Specific disease waiting period: Certain diseases like hernia, cataract have 24-month waiting period",
-                        "⚠️ Room rent capping: Daily room rent is limited to 1-2% of sum assured",
-                        "⚠️ Sub-limits on specific procedures: Each medical procedure has a maximum claim limit",
-                        "⚠️ Co-payment requirements: Policyholder must pay 10-20% of claim amount",
-                        "⚠️ Disease-wise waiting periods: Different waiting periods for different diseases",
-                        "⚠️ Network hospital restrictions: Cashless treatment only at network hospitals",
-                        "⚠️ Documentation requirements: Strict documentation needed for claim approval",
-                        "⚠️ Claim settlement conditions: Claims can be rejected for minor documentation errors",
-                        "⚠️ Policy renewal terms: Premium may increase significantly at renewal",
-                        "⚠️ Day care procedures: Limited coverage for procedures not requiring 24-hour hospitalization",
-                        "⚠️ Alternative treatments: Limited coverage for Ayurveda, Homeopathy, etc.",
-                        "⚠️ Dental treatments: Only emergency dental procedures are covered",
-                        "⚠️ Cosmetic surgeries: Not covered unless medically necessary",
-                        "⚠️ Maternity benefits: Limited coverage with waiting period",
-                        "⚠️ Mental health: Limited coverage for psychiatric treatments"
+                        f"⚠️ {point}" for point in result.get('loopholes', [])
                     ]
                 }
             },
